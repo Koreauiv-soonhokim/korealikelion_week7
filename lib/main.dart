@@ -49,17 +49,13 @@ final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>(
 });
 
 void main() async {
-  // Flutter 엔진과 위젯 트리가 바인딩되기 전에 비동기 작업을 하기 위해 필수!
   WidgetsFlutterBinding.ensureInitialized();
   
-  // SharedPreferences 인스턴스를 비동기로 먼저 가져옴
   final prefs = await SharedPreferences.getInstance();
 
   runApp(
-    // ✅ 과제 조건: ProviderScope로 앱 감싸기
     ProviderScope(
       overrides: [
-        // 위에서 가져온 prefs를 전역 프로바이더에 주입 (이후로는 await 없이 동기적으로 사용 가능)
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
       child: const MyApp(),
@@ -67,13 +63,11 @@ void main() async {
   );
 }
 
-// ✅ 과제 조건: ConsumerWidget 사용
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ✅ 과제 조건: ref.watch()로 상태를 구독해서 UI(테마)에 표시
     final settings = ref.watch(settingsProvider);
 
     return MaterialApp(
@@ -89,10 +83,8 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ✅ 과제 조건: ref.watch()로 닉네임과 다크모드 상태 구독
     final settings = ref.watch(settingsProvider);
     
-    // TextField의 초기값을 현재 닉네임으로 세팅
     final textController = TextEditingController(text: settings.nickname);
 
     return Scaffold(
@@ -119,10 +111,10 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // ✅ 과제 조건: ref.read(provider.notifier)로 버튼 이벤트에서 상태 변경
+              
                 ref.read(settingsProvider.notifier).updateNickname(textController.text);
                 
-                // 키보드 내리기
+                
                 FocusScope.of(context).unfocus();
               },
               child: const Text('닉네임 저장'),
@@ -135,7 +127,7 @@ class HomeScreen extends ConsumerWidget {
                 Switch(
                   value: settings.isDarkMode,
                   onChanged: (value) {
-                    // ✅ 과제 조건: ref.read(provider.notifier)로 스위치 이벤트에서 상태 변경
+                   
                     ref.read(settingsProvider.notifier).toggleDarkMode();
                   },
                 ),
